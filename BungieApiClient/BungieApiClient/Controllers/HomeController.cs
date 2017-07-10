@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using BungieApiClient.BungieApiHelpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BungieApiClient.Controllers
@@ -13,23 +11,25 @@ namespace BungieApiClient.Controllers
             return View();
         }
 
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
+	    [HttpPost]
+	    public async Task<IActionResult> Index(string playername, string playerId)
+	    {
+			if(string.IsNullOrEmpty(playerId))
+				playerId = await ApiHelper.GetBungiePlayerId(playername);
 
-            return View();
-        }
+		    if (playerId == "0")
+		    {
+			    ModelState.AddModelError("PlayerName", "Sorry, could not find player.");
+			    return View();
+		    }
 
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
+		    return RedirectToAction("Hud", "Home", new { playerId = playerId });
+	    }
 
-            return View();
-        }
+	    public IActionResult Hud(string playerId)
+	    {
+		    return View();
+	    }
 
-        public IActionResult Error()
-        {
-            return View();
-        }
-    }
+	}
 }
